@@ -78,3 +78,14 @@ CLI switching does not ask for the admin password, as decided (tokens are protec
   - single-instance cases: reuse, stale PID with a matching identity, PID reuse with a mismatched start time (signals nothing), a foreign process holding the port;
   - the password prompt refuses without a TTY.
 - The end-to-end checklist above is complete and recorded in the phase notes.
+
+## Live run notes (2026-11-03 20:22, Codex only)
+
+- Fresh credential backup before switching: `~/ah-preflight-backup/ah-creds-20261103-2022.tar.zst`.
+- Captured the live Codex login as `crypto` (the ChatGPT team account). The drift flag on the uncaptured login cleared.
+- With the app-server daemon running, `ah switch codex-cli personal` was refused with exit 2 and named both processes. `auth.json` was unchanged.
+- After `codex app-server daemon stop`, the `codex app-server daemon pid-update-loop` helper kept running and still forced `--force`. It holds only its updater lock and log, never `auth.json`. It is now ignored by the running check, with a regression test.
+- crypto → personal → crypto: each switch installed the right account (`id_token` email), kept `config.toml` byte-identical and left `auth.json` at 0600. On crypto, `codex exec` worked and the refresh token was unchanged after use.
+- **personal is unusable:** its refresh token was revoked by OpenAI. The snapshot token matches the 15:56 backup (last refresh 2026-10-30), so ah neither rotated nor altered it. The revocation happened after 15:56, most likely when `codex login` signed out personal to log in crypto. Re-login of personal is needed.
+- Audit log: two refusals and two ok switches, in order, with messages.
+- Not run: steps 4–6 for Claude (no second Claude account yet; user chose to skip).

@@ -160,6 +160,10 @@ Applied without a question (mechanical errors):
   - Captured "personal" for claude-cli, codex-cli and claude-desktop.
 - **Not yet run (Phase 7 steps 4–7):** real switching between two accounts, a forced switch with an open session, the desktop switch and relaunch, and the browser login and audit check. The user's second logins did not reach the credential files, so the live test was skipped by the user. The refresh-token rotation question stays open.
 
+- **Live Codex run (20:22):** capture, refusal, forced switching both ways and the audit log all verified; details in the Phase 7 notes. Fixed: the daemon's `pid-update-loop` helper no longer blocks switching. Found: the older `personal` Codex snapshot had been revoked server-side, most likely by the `codex login` used to add the second account.
+
 ## Unresolved questions
 
-- Do Claude and Codex rotate refresh tokens on use? Settle this during the real switching test (Phase 7 step 5).
+- Do Claude and Codex rotate refresh tokens on use? Codex did not rotate during one live call on a valid access token; a refresh cycle is still unobserved. Claude is untested.
+- Does `codex login` (or logout) revoke the previous account's tokens? The evidence points that way. If confirmed, a second Codex account must be logged in under a separate `CODEX_HOME`, and ah would need a way to capture from there.
+- Claude steps 4–6 (CLI switching, forced switch with an open session, desktop switch and relaunch) still need a second Claude account.
