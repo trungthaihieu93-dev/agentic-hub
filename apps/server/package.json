@@ -1,0 +1,73 @@
+{
+  "name": "@agentic-hub/server",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "name": "server",
+    "targets": {
+      "build": {
+        "executor": "@nx/esbuild:esbuild",
+        "outputs": [
+          "{options.outputPath}"
+        ],
+        "defaultConfiguration": "production",
+        "options": {
+          "platform": "node",
+          "outputPath": "apps/server/dist",
+          "format": [
+            "esm"
+          ],
+          "bundle": true,
+          "thirdParty": true,
+          "target": "node26",
+          "main": "apps/server/src/main.ts",
+          "tsConfig": "apps/server/tsconfig.app.json",
+          "generatePackageJson": false,
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".js"
+            },
+            "banner": {
+              "js": "import { createRequire as __ahCreateRequire } from 'node:module';\nconst require = __ahCreateRequire(import.meta.url);"
+            }
+          }
+        },
+        "configurations": {
+          "development": {
+            "esbuildOptions": {
+              "sourcemap": true,
+              "outExtension": {
+                ".js": ".js"
+              },
+              "banner": {
+                "js": "import { createRequire as __ahCreateRequire } from 'node:module';\nconst require = __ahCreateRequire(import.meta.url);"
+              }
+            }
+          },
+          "production": {}
+        }
+      },
+      "serve": {
+        "continuous": true,
+        "executor": "nx:run-commands",
+        "dependsOn": [
+          "build",
+          {
+            "projects": [
+              "web"
+            ],
+            "target": "build"
+          }
+        ],
+        "options": {
+          "command": "node apps/server/dist/main.js"
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "@agentic-hub/server-lib": "workspace:*"
+  },
+  "type": "module"
+}

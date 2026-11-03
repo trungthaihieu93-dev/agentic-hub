@@ -1,0 +1,85 @@
+{
+  "name": "@agentic-hub/cli",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "name": "cli",
+    "targets": {
+      "build-bundle": {
+        "executor": "@nx/esbuild:esbuild",
+        "outputs": [
+          "{options.outputPath}"
+        ],
+        "defaultConfiguration": "production",
+        "options": {
+          "platform": "node",
+          "outputPath": "apps/cli/dist",
+          "format": [
+            "esm"
+          ],
+          "bundle": true,
+          "thirdParty": true,
+          "target": "node26",
+          "main": "apps/cli/src/main.ts",
+          "tsConfig": "apps/cli/tsconfig.app.json",
+          "generatePackageJson": false,
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".js"
+            },
+            "banner": {
+              "js": "#!/usr/bin/env node\nimport { createRequire as __ahCreateRequire } from 'node:module';\nconst require = __ahCreateRequire(import.meta.url);"
+            }
+          }
+        },
+        "configurations": {
+          "development": {
+            "esbuildOptions": {
+              "sourcemap": true,
+              "outExtension": {
+                ".js": ".js"
+              },
+              "banner": {
+                "js": "#!/usr/bin/env node\nimport { createRequire as __ahCreateRequire } from 'node:module';\nconst require = __ahCreateRequire(import.meta.url);"
+              }
+            }
+          },
+          "production": {}
+        }
+      },
+      "build": {
+        "executor": "nx:run-commands",
+        "dependsOn": [
+          "build-bundle",
+          {
+            "projects": [
+              "web"
+            ],
+            "target": "build"
+          }
+        ],
+        "outputs": [
+          "{projectRoot}/dist"
+        ],
+        "cache": true,
+        "inputs": [
+          "production",
+          "^production",
+          {
+            "externalDependencies": []
+          }
+        ],
+        "options": {
+          "command": "node apps/cli/scripts/post-build.mjs"
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "@agentic-hub/core": "workspace:*",
+    "@agentic-hub/server-lib": "workspace:*",
+    "@agentic-hub/shared": "workspace:*"
+  },
+  "type": "module"
+}
