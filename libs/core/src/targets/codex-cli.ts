@@ -28,6 +28,14 @@ export function codexDaemonProcess(pidFile: string): ProcInfo | null {
   return procInfo(d.pid);
 }
 
+/**
+ * `codex app-server daemon pid-update-loop` outlives `codex app-server daemon stop`. It holds only
+ * its updater lock and log, never auth.json, so it cannot write an old login back.
+ */
+function isDaemonUpdaterLoop(p: ProcInfo): boolean {
+  return p.cmdline.slice(1).join(' ') === 'app-server daemon pid-update-loop';
+}
+
 /** Codex CLI: the whole ~/.codex/auth.json is the login and is swapped atomically. */
 export function codexCliTarget(deps: CoreDeps): AccountTarget {
   const { paths } = deps;
@@ -44,7 +52,7 @@ export function codexCliTarget(deps: CoreDeps): AccountTarget {
     async runningProcesses() {
       const found = new Map<number, ProcInfo>();
       for (const p of procsOf(deps)) {
-        if (p.exe && path.basename(p.exe) === 'codex') found.set(p.pid, p);
+        if (p.exe && path.basename(p.exe) === 'codex' && !isDaemonUpdaterLoop(p)) found.set(p.pid, p);
       }
       const daemon = codexDaemonProcess(paths.codexDaemonPid);
       if (daemon) found.set(daemon.pid, daemon);

@@ -386,6 +386,15 @@ describe('codex-cli switching', () => {
     expect((await switchAccount(env.deps, { target: 'codex-cli', accountId: x.id, actor: 'cli' })).outcome).toBe('ok');
   });
 
+  it('ignores the daemon updater loop, which never holds auth.json', async () => {
+    const { x, y } = await captureXY();
+    const exe = '/h/.codex/packages/app-server-daemon/releases/0.166.0/bin/codex';
+    env.procs.push({ pid: 5151, exe, cmdline: [exe, 'app-server', 'daemon', 'pid-update-loop'] });
+    expect((await switchAccount(env.deps, { target: 'codex-cli', accountId: x.id, actor: 'cli' })).outcome).toBe('ok');
+    env.procs.push({ pid: 5152, exe, cmdline: [exe, 'app-server', '--listen', 'unix://', '--managed-daemon'] });
+    expect(await switchAccount(env.deps, { target: 'codex-cli', accountId: y.id, actor: 'cli' })).toMatchObject({ outcome: 'refused', needsForce: true });
+  });
+
   it.each([
     ['started', 'acct-y'],
     ['installing', 'acct-y'],
