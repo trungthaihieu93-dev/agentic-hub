@@ -22,6 +22,8 @@
           "target": "node26",
           "main": "apps/cli/src/main.ts",
           "tsConfig": "apps/cli/tsconfig.app.json",
+          "skipTypeCheck": true,
+          "declaration": false,
           "generatePackageJson": false,
           "esbuildOptions": {
             "sourcemap": false,
