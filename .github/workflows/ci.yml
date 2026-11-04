@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - uses: oven-sh/setup-bun@v2.2.0
+        with:
+          bun-version: 1.4.4
+
+      # node:sqlite and the ah runtime need Node 26 (package.json engines).
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 26
+
+      - run: bun install --frozen-lockfile
+
+      - name: Lint, test, build and typecheck
+        run: bunx nx run-many -t lint test build typecheck --output-style=static
+
+      - name: Validate OpenSpec specs
+        run: bun run spec:validate
