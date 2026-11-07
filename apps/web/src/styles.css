@@ -1,13 +1,39 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-/* Sonner also injects these rules at runtime; the server CSP blocks that inline
-   <style>, so the bundled copy is what actually styles the toasts. */
+/* Bundle Sonner's rules as well as its runtime styles. The server CSP permits
+   inline styles, while scripts must come from the same origin. */
 @import 'sonner/dist/styles.css';
 
-/* Single dark theme. Tokens and rationale: docs/design-guidelines.md */
+/* Semantic theme tokens. Rationale: docs/design-guidelines.md */
 :root {
-  color-scheme: dark;
+  color-scheme: light;
   --radius: 0.5rem;
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --primary: #1d4ed8;
+  --primary-foreground: #ffffff;
+  --secondary: #e2e8f0;
+  --secondary-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #475569;
+  --accent: #e2e8f0;
+  --accent-foreground: #0f172a;
+  --destructive: #b91c1c;
+  --destructive-foreground: #ffffff;
+  --success: #166534;
+  --warning: #92400e;
+  --danger: #991b1b;
+  --border: #cbd5e1;
+  --input: #64748b;
+  --ring: #1d4ed8;
+}
+
+:root.dark {
+  color-scheme: dark;
   --background: #0b1120;
   --foreground: #e2e8f0;
   --card: #111a2e;

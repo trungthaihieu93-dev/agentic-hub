@@ -9,6 +9,7 @@ import { ProviderMark } from '@/components/provider-mark';
 import { UnsavedList } from '@/components/unsaved-list';
 import type { UiTarget } from '@/lib/api';
 import { formatRelative } from '@/lib/format';
+import { cn } from '@/lib/utils';
 
 interface TargetCardProps {
   target: UiTarget;
@@ -24,7 +25,7 @@ export function TargetCard({ target, onSwitch, onCapture, onAddEmpty }: TargetCa
   const titleId = `target-${target.target}-title`;
 
   return (
-    <Card aria-labelledby={titleId} className={enabled ? undefined : 'opacity-80'} role="region">
+    <Card aria-labelledby={titleId} className={cn('min-w-0', !enabled && 'opacity-80')} role="region">
       <CardHeader>
         <ProviderMark info={info} />
         <div className="min-w-0 flex-1 space-y-1.5">
@@ -49,7 +50,7 @@ export function TargetCard({ target, onSwitch, onCapture, onAddEmpty }: TargetCa
       ) : (
         <>
           <CardContent className="space-y-4">
-            <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-sm">
+            <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1.5 text-sm [overflow-wrap:anywhere]">
               <dt className="text-muted-foreground">Active</dt>
               <dd className="min-w-0">
                 {target.active ? (

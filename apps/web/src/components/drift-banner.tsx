@@ -17,7 +17,7 @@ export function DriftBanner({ active, live, onCaptureAs, onSwitchBack }: DriftBa
       <div className="flex items-start gap-2">
         <AlertTriangle className="mt-0.5 size-4 shrink-0 text-warning" aria-hidden="true" />
         <div className="min-w-0 flex-1 space-y-2">
-          <p>
+          <p className="[overflow-wrap:anywhere]">
             <span className="font-semibold">Login drift: </span>
             the live login is now {liveText}
             {active ? `, not the active account "${active.label}"` : ''}. A running session may have written
@@ -28,7 +28,12 @@ export function DriftBanner({ active, live, onCaptureAs, onSwitchBack }: DriftBa
               Capture as…
             </Button>
             {active && (
-              <Button size="sm" variant="outline" onClick={onSwitchBack}>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-auto min-h-8 max-w-full whitespace-normal py-1.5 text-left [overflow-wrap:anywhere]"
+                onClick={onSwitchBack}
+              >
                 Switch back to {active.label}
               </Button>
             )}
