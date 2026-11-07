@@ -12,6 +12,20 @@
 
 Targets are `claude-cli` (alias `claude`), `codex-cli` (aliases `codex` and `codex-desktop`), and `claude-desktop`.
 
+## Dashboard navigation and appearance
+
+Use Accounts to manage provider logins and Audit log to review switch attempts.
+At widths of 1024px and above, both pages are in the left sidebar. In narrower
+windows, open the menu drawer; select a page, press Escape, or click outside it
+to close it. The bottom section contains Local admin, Light/Dark controls, and
+Sign out. Provider account details remain on Accounts.
+
+Appearance initially follows your device. Choose Light or Dark in the
+navigation footer or on the sign-in page to remember an explicit preference
+in this browser. That choice applies throughout the dashboard and takes
+precedence over device-theme changes, including after a reload. If browser
+storage is blocked, your choice still works until you reload the page.
+
 ## Adding another account
 
 - **Claude Code / Codex:** capture the current login, run `claude auth login` or `codex login` with the other account, then capture again under a new label.

@@ -1,0 +1,20 @@
+{
+  "accountBoard": [
+    {
+      "theme": "Light",
+      "minimum": 6.07,
+      "belowTarget": []
+    },
+    {
+      "theme": "Dark",
+      "minimum": 5.17,
+      "belowTarget": []
+    }
+  ],
+  "hover": {
+    "primary": 5.493,
+    "destructive": 5.608,
+    "media": "fine pointer and hover enabled through Chromium blink settings"
+  },
+  "status": "passed"
+}

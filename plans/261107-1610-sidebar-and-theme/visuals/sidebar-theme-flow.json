@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Appearance across the dashboard",
+    "visual_preset": "classic",
+    "theme": "light",
+    "animation": "none"
+  },
+  "lanes": [
+    {
+      "id": "browser",
+      "label": "Browser",
+      "role": "frontend"
+    }
+  ],
+  "steps": [
+    {
+      "id": "initial",
+      "label": "Saved choice or device theme",
+      "lane": "browser",
+      "kind": "start"
+    },
+    {
+      "id": "apply",
+      "label": "Apply before first paint",
+      "lane": "browser",
+      "kind": "action"
+    },
+    {
+      "id": "screens",
+      "label": "Login, pages, dialogs, toasts",
+      "lane": "browser",
+      "kind": "terminal-success"
+    }
+  ],
+  "transitions": [
+    {
+      "from": "initial",
+      "to": "apply"
+    },
+    {
+      "from": "apply",
+      "to": "screens"
+    }
+  ]
+}
