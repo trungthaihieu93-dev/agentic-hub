@@ -1,9 +1,61 @@
 import type { ReactElement } from 'react';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { runInNewContext } from 'node:vm';
 import { render, type RenderResult } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { vi } from 'vitest';
 import type { AccountDto } from '@agentic-hub/shared';
 import type { UiTarget } from '@/lib/api';
+
+const themeBootstrap = readFileSync(resolve(import.meta.dirname, '../../public/theme-init.js'), 'utf8');
+
+/** Run the shipped controller, rather than a test-only theme implementation. */
+export function initializeTheme(): void {
+  runInNewContext(themeBootstrap, { window, document });
+}
+
+/** Match the layout's real breakpoint while allowing a test to cross it. */
+export function mockViewport(initialWidth: number) {
+  let width = initialWidth;
+  const queries = new Map<string, { media: MediaQueryList; listeners: Set<(event: MediaQueryListEvent) => void> }>();
+  const matches = (query: string) => {
+    const minimum = /min-width:\s*(\d+)px/.exec(query);
+    return minimum ? width >= Number(minimum[1]) : false;
+  };
+  vi.stubGlobal('innerWidth', width);
+  vi.spyOn(window, 'matchMedia').mockImplementation((query) => {
+    const existing = queries.get(query);
+    if (existing) return existing.media;
+    const listeners = new Set<(event: MediaQueryListEvent) => void>();
+    const media = {
+      get matches() { return matches(query); },
+      media: query,
+      onchange: null,
+      addEventListener: (_type: string, listener: (event: MediaQueryListEvent) => void) => listeners.add(listener),
+      removeEventListener: (_type: string, listener: (event: MediaQueryListEvent) => void) => listeners.delete(listener),
+      addListener: (listener: (event: MediaQueryListEvent) => void) => listeners.add(listener),
+      removeListener: (listener: (event: MediaQueryListEvent) => void) => listeners.delete(listener),
+      dispatchEvent: () => false,
+    } as MediaQueryList;
+    queries.set(query, { media, listeners });
+    return media;
+  });
+  return {
+    resize(nextWidth: number) {
+      const previous = new Map([...queries].map(([query]) => [query, matches(query)]));
+      width = nextWidth;
+      vi.stubGlobal('innerWidth', width);
+      queries.forEach(({ media, listeners }, query) => {
+        if (media.matches !== previous.get(query)) {
+          const event = { matches: media.matches, media: query } as MediaQueryListEvent;
+          listeners.forEach((listener) => listener(event));
+        }
+      });
+      window.dispatchEvent(new Event('resize'));
+    },
+  };
+}
 
 export function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });

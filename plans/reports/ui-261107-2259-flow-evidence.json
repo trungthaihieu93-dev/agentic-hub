@@ -1,0 +1,23 @@
+{
+  "passed": [
+    "drawer initially focuses the active navigation",
+    "drawer traps keyboard Tab focus",
+    "Escape restores focus to the visible menu trigger",
+    "same-route navigation closes the drawer and focuses main",
+    "route navigation closes the drawer and focuses main",
+    "browser Back closes the drawer and updates the route",
+    "browser Forward closes the drawer and updates the route",
+    "overlay dismissal restores trigger focus",
+    "desktop resize closes the modal and enables only desktop navigation",
+    "real switch refusal lists running-session warning and force choice",
+    "confirmed forced switch succeeds against the isolated account engine",
+    "audit shows both refusal and successful switch",
+    "narrow audit view scrolls inside the table without page overflow",
+    "failed sign-out keeps the authenticated route, drawer, and audit data",
+    "successful drawer sign-out reaches focused themed login without protected navigation",
+    "Back after sign-out cannot reveal the protected dashboard",
+    "navigation/account/logout flows have no runtime exceptions"
+  ],
+  "runtimeErrors": [],
+  "externalProviders": "existing isolated provider/process fixtures; real app/auth/database/account engine"
+}

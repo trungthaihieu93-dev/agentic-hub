@@ -1,47 +1,75 @@
 # ah dashboard: design guidelines
 
-The design system for the `ah` dashboard (`apps/web`). It was derived with the
-`ak-ui-ux-pro-max` design-system search ("developer tool dashboard, dense, calm,
-dark") and adapted: the search proposed a light background, an orange CTA and
-Google-hosted Inter, which this product does not use.
+The design system for the `ah` dashboard (`apps/web`): a dense, calm interface
+with semantic light and dark palettes, system fonts, and keyboard access.
 
-The tokens live in `apps/web/src/styles.css` (CSS variables mapped into Tailwind v4
-with `@theme inline`); components are shadcn/ui (new-york style, Radix
-primitives) under `apps/web/src/components/ui`. This file explains the intent.
-When the two disagree, the stylesheet is what ships, so update both.
+The [stylesheet](../apps/web/src/styles.css) owns token values and their
+Tailwind v4 mapping. Components are shadcn/ui (new-york style, Radix
+primitives) under [the shared UI directory](../apps/web/src/components/ui).
+This file explains the intent; keep it aligned with the executable owners.
 
 ## Product brief
 
 - A local developer tool used for a few seconds at a time to check and switch
   Claude and Codex logins. It should be dense, calm and keyboard friendly.
-- There is one theme, and it is dark. No light mode and no theme toggle.
+- Light and Dark share the same layout, density, and semantic component styles.
 - Claude and Codex appear as text labels with a neutral monogram (`Cl`, `Cx`).
   No logos, brand colours or brand art.
-- Viewport target: desktop, checked at 1280px. Cards stack to one column below
-  the `lg` breakpoint, so narrow windows still work without horizontal scroll.
+- Desktop navigation must leave enough room for account cards; narrow and
+  short windows must keep navigation, content, and footer actions reachable.
+
+## Navigation and responsive layout
+
+- At `lg` (1024px) and above, use an approximately 14rem left sidebar with the
+  `ah` brand, Accounts, and Audit log. The bottom section holds Local admin,
+  Light/Dark controls, and Sign out, and remains reachable in short windows.
+- Local admin identifies the password-protected local session. Provider
+  identities stay on Accounts; the sidebar has no admin email or avatar.
+- Below 1024px, a compact top bar exposes a labelled menu button. Its left
+  drawer contains the same navigation and footer actions. Only the active
+  navigation is exposed to keyboard and assistive-technology users.
+- The drawer traps focus and closes on Escape, overlay click, navigation
+  (including the current page and browser back/forward), or resizing to desktop.
+  Dismissal restores focus to the visible menu trigger; navigation and desktop
+  resizing move focus to the main content.
+- Account cards use one column below `xl` (1280px) and two at `xl` and above,
+  leaving room for the sidebar. Long content must wrap without page-level horizontal
+  scrolling; the audit table keeps its own horizontal scroll region.
+
+The [layout](../apps/web/src/app/layout.tsx) owns the shell and drawer lifecycle;
+the [router](../apps/web/src/app/router.tsx) owns links and current-page state.
+
+## Appearance
+
+With no valid saved preference, appearance follows the device, including later
+device-theme changes. Choosing Light or Dark applies immediately and stores
+that explicit choice as `ah-theme` in browser storage. Only exact `light` and
+`dark` values count; the saved choice wins over device settings on reload. If
+storage is denied, the choice still works until the page is reloaded. The
+interface offers those two choices, without a System or reset control.
+
+The [same-origin bootstrap](../apps/web/public/theme-init.js) owns preference
+resolution. The [HTML entry](../apps/web/index.html) loads it before styles so
+appearance resolves before first paint without an inline script. All screens
+use the same resolved theme: login, auth loading/errors, Accounts, Audit,
+dialogs and menu portals, and toasts. The shared appearance control uses
+visible Light/Dark labels with `aria-pressed`; it sits outside the login form
+and in the authenticated navigation footer.
 
 ## Colour
 
-All colours are semantic tokens. Components never use raw hex values.
+All colours are semantic tokens. Components never use raw hex values. The
+[stylesheet](../apps/web/src/styles.css) owns both palettes; retain the existing
+dark token values. Light mode uses darker status colours so text stays legible
+on light tinted surfaces. [Status badges](../apps/web/src/components/ui/badge.tsx)
+own their shared tint treatment.
 
-| Token | Value | Use | Contrast |
-|-------|-------|-----|----------|
-| `background` | `#0b1120` | page | |
-| `card` | `#111a2e` | cards, login panel | |
-| `popover` | `#16203a` | dialogs, menus | |
-| `muted` | `#1a2438` | quiet fills (code, notes) | |
-| `foreground` | `#e2e8f0` | body text | 14.1:1 on card |
-| `muted-foreground` | `#94a3b8` | secondary text | 6.8:1 on card |
-| `border` / `input` | `#263247` / `#334155` | dividers / control outlines | |
-| `primary` | `#2563eb` + white text | the one main action per view | 5.2:1 |
-| `destructive` | `#dc2626` + white text | delete, "Switch anyway" | 4.8:1 |
-| `ring` | `#60a5fa` | focus ring | 6.8:1 on card |
-| `success` | `#22c55e` | active account, OK outcome | 7.6:1 on card |
-| `warning` | `#f59e0b` | drift, running sessions, refused / rolled back | 8.1:1 on card |
-| `danger` | `#f87171` | errors, failed, "quit the app first" | 6.3:1 on card |
-
-Status tints are the status colour at 10% fill with a 40% border, and text in
-the full status colour.
+Normal text must reach 4.5:1 contrast; large text and essential control/focus
+indicators must reach 3:1 against adjacent colours in both themes. The
+[shared Input](../apps/web/src/components/ui/input.tsx) uses semantic
+`muted-foreground` opacity for its boundary to meet control contrast without
+changing the dark palette. Check the rendered status tints and focus states,
+including their opacity, rather than comparing only the base tokens.
 
 **Colour is never the only signal.** Every status also has text and, where it
 helps, a Lucide icon: "Active" plus a check, "Login drift" plus a warning
@@ -51,7 +79,10 @@ triangle, audit outcomes as icon plus word ("OK", "Refused", "Rolled back",
 ## Typography
 
 - System font stacks only (`ui-sans-serif, system-ui, …` and `ui-monospace, …`).
-  The server sends CSP `default-src 'self'`, so remote fonts and CDNs are not allowed.
+  The [server CSP](../libs/server/src/middleware/security-headers.ts) uses
+  `default-src 'self'`, which excludes remote fonts, CDNs, and inline scripts.
+  Its `style-src 'self' 'unsafe-inline'` permits inline styles; theme startup
+  uses the external same-origin script without weakening that policy.
 - Base size 14px (`text-sm`) for this dense tool UI; 12px (`text-xs`) only for
   metadata such as timestamps, pids and section labels. Page titles use
   `text-lg` and card titles `text-base`, both semibold.
@@ -76,7 +107,7 @@ triangle, audit outcomes as icon plus word ("OK", "Refused", "Rolled back",
 | Drift banner | `role="alert"`, warning tint: "Capture as…" and "Switch back to <label>" |
 | Switch dialog | Confirm, then, depending on the response: 409 lists the processes, gives the re-login warning, and offers "Switch anyway" (destructive); 423 says "Quit <App> first." and offers "Try again"; desktop targets get a "Relaunch <App> after switching" checkbox |
 | Destructive confirm | A dialog with Cancel and a destructive confirm button |
-| Toasts | sonner, bottom-right, rich colours with icons; the result message goes in the description |
+| Toasts | sonner, bottom-right, rich colours with icons and the resolved theme; the result message goes in the description |
 | Loading / error | `role="status"` text while loading; `role="alert"` with a Retry button on error |
 
 Buttons: one `primary` per view region (Capture current login, Sign in,
@@ -89,14 +120,16 @@ Switch). Use `secondary`/`outline` for the rest, `ghost` for icon buttons, and
   "More actions for work" and "Delete unsaved snapshot <version>").
 - Focus is always visible: a 2px `ring` colour with an offset on buttons, and
   border plus ring on inputs. Focus outlines are never removed.
-- Dialogs are Radix: they trap focus, close on Escape and restore focus to the
-  trigger. The first field gets focus on open.
+- Form and confirmation dialogs are Radix: they trap focus, close on Escape and
+  restore focus to the trigger. The first field gets focus on open. The
+  navigation drawer follows the focus rules above.
 - Forms validate on submit, show the error below the field (`role="alert"`,
   `aria-invalid`, `aria-describedby`) and keep the user's input. Labels are
   checked with the shared `labelSchema`.
 - Login: the password field gets focus on load, and again after an error.
 - Navigation: a skip link, `<nav aria-label="Main">` and `aria-current="page"`.
-- Motion: 150ms colour and opacity transitions only, all disabled under
+  Preserve standard link behaviour, including modified clicks and history.
+- Motion remains brief; animations and transitions respect
   `prefers-reduced-motion`.
 - No hover-only information. A cmdline in a `title` duplicates text that is
   already visible.
@@ -109,7 +142,7 @@ current.
 
 ## Anti-patterns
 
-- Light theme, a theme toggle, or brand logos and colours for Claude or Codex.
+- Brand logos and colours for Claude or Codex.
 - Remote fonts, CDNs, or inline `<script>` (they break the CSP).
 - Status shown only as a coloured dot.
 - Emoji as icons; use Lucide SVGs with `aria-hidden` next to text.
