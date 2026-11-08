@@ -19,8 +19,7 @@ See [docs/usage.md](docs/usage.md) for commands and safety behaviour.
 
 ```sh
 bun install --frozen-lockfile
-bunx nx run-many -t build      # builds web, server and the `ah` bundle (web UI copied next to it)
-bun link                       # puts `ah` on your PATH (~/.bun/bin/ah)
+bun run publish:local           # builds all projects and puts `ah` on your PATH (~/.bun/bin/ah)
 ah init                        # set the admin password once; creates ~/.ah (0700)
 ah                             # opens http://ah.localhost:7427
 ```
@@ -29,6 +28,11 @@ ah                             # opens http://ah.localhost:7427
 
 | Command | Purpose |
 |---|---|
+| `bun run dev` | Starts the backend on port 7427 and Vite on `http://ah.localhost:5173` |
+| `bun run test` | Runs all workspace tests once |
+| `bun run lint` | Lints all workspace projects |
+| `bun run build` | Builds all workspace projects, including the `ah` bundle and its web UI |
+| `bun run publish:local` | Builds all projects and links `ah` locally with `bun link` |
 | `bunx nx run-many -t lint test build typecheck` | Full check (tests use temporary homes, never your real files) |
 | `bunx nx serve server` | Dev server on port 7427 using `apps/web` output |
 | `bunx nx serve web` | Vite on `http://ah.localhost:5173`, proxying `/api` to the dev server |

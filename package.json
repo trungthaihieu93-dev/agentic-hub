@@ -3,6 +3,11 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
+    "dev": "nx run-many -t serve -p server web --parallel=2",
+    "test": "nx run-many -t test --watch=false",
+    "lint": "nx run-many -t lint",
+    "build": "nx run-many -t build",
+    "publish:local": "bun run build && bun link",
     "spec:validate": "openspec validate --all --strict --no-interactive",
     "ah": "node apps/cli/dist/main.js"
   },
