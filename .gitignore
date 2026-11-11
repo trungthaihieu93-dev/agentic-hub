@@ -53,3 +53,8 @@ vitest.config.*.timestamp*
 *.db-wal
 *.db-shm
 test-output
+
+# Generated documentation
+apps/docs/.astro
+apps/docs/src/content/docs/usage.md
+apps/docs/src/content/docs/design-guidelines.md
