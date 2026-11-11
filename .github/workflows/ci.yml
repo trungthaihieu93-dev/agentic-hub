@@ -56,10 +56,12 @@ jobs:
       group: docs-production
       cancel-in-progress: false
     steps:
+      - uses: actions/checkout@v7.0.1
+
       - uses: actions/download-artifact@v4
         with:
           name: documentation
-          path: docs-output
+          path: apps/docs/dist
 
       - uses: oven-sh/setup-bun@v2.2.0
         with:
@@ -83,12 +85,10 @@ jobs:
             echo 'Skipping an outdated production deployment.'
           fi
 
-      - name: Deploy to Cloudflare Pages
+      - name: Deploy to Cloudflare Workers
         if: steps.revision.outputs.current == 'true'
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT_NAME }}
         run: |
-          test -n "$PAGES_PROJECT" || { echo 'Set the CLOUDFLARE_PAGES_PROJECT_NAME repository variable.'; exit 1; }
-          bunx wrangler@4.160.0 pages deploy docs-output --project-name "$PAGES_PROJECT" --branch main
+          bunx wrangler@4.160.0 deploy --config apps/docs/wrangler.jsonc --keep-vars
