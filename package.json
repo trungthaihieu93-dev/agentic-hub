@@ -7,6 +7,9 @@
     "test": "nx run-many -t test --watch=false",
     "lint": "nx run-many -t lint",
     "build": "nx run-many -t build",
+    "docs:dev": "bun run --cwd apps/docs dev",
+    "docs:build": "bun run --cwd apps/docs build",
+    "docs:preview": "bun run --cwd apps/docs preview",
     "publish:local": "bun run build && bun link",
     "spec:validate": "openspec validate --all --strict --no-interactive",
     "ah": "node apps/cli/dist/main.js"

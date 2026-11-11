@@ -1,0 +1,15 @@
+{
+  "name": "@agentic-hub/docs",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun scripts/prepare-docs.mjs && astro dev",
+    "build": "bun scripts/prepare-docs.mjs && astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "0.42.10",
+    "astro": "7.4.10"
+  }
+}
